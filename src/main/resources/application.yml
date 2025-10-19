@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Coupon Rush
+    name: CouponRush
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/coupon
