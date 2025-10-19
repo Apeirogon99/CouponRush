@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: Coupon Rush
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/coupon
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+server:
+  port: 8080
