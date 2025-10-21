@@ -37,7 +37,7 @@ public class CouponService {
      * 쿠폰 발급
      * 쿠폰 아이디를 기준으로 쿠폰 발급
      */
-    @Transactional(isolation = Isolation.READ_COMMITTED, timeout = 5)
+    @Transactional(isolation = Isolation.READ_COMMITTED, timeout = 2)
     public void issueCoupon(long userId, long couponId) {
 
         // 쿠폰 조회 및 락

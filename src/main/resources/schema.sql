@@ -41,5 +41,5 @@ COMMENT ON COLUMN coupon_issues.user_id IS '유저 아이디';
 COMMENT ON COLUMN coupon_issues.issued_at IS '발급일자';
 
 -- 부하 테스트
-INSERT INTO coupons (name, total_quantity) VALUES ('OO치킨 5000원 할인 쿠폰', 3);
+INSERT INTO coupons (name, total_quantity) VALUES ('할로윈 쿠폰', 500);
 -- INSERT INTO coupons (name, total_quantity) VALUES ('XX강의 30% 할인 쿠폰', 1000);

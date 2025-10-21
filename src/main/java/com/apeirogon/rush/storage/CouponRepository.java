@@ -2,12 +2,10 @@ package com.apeirogon.rush.storage;
 
 import com.apeirogon.rush.domain.Coupon;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
