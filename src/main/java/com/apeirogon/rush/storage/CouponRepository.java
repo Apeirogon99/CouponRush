@@ -83,6 +83,14 @@ public class CouponRepository {
         );
     }
 
+    public int increaseIssuedQuantityWithCheck(Long couponId) {
+        return jdbc.update(
+                "UPDATE coupons SET issued_quantity = issued_quantity + 1, updated_at = ? WHERE id = ? AND issued_quantity <= total_quantity",
+                LocalDateTime.now(),
+                couponId
+        );
+    }
+
     /**
      * 쿠폰 저장
      * 발급 수량과 업데이트만 저장

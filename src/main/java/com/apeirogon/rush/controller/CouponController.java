@@ -52,7 +52,7 @@ public class CouponController {
     @PostMapping("/api/coupons/{couponId}/issue")
     public ResponseEntity<CouponIssueResponse> issueCoupon(@PathVariable Long couponId, @RequestParam Long userId) {
         try {
-            couponService.issueCoupon(userId, couponId);
+            couponService.issueCouponWithUpdate(userId, couponId);
             return ResponseEntity.ok(new CouponIssueResponse(true, "구폰이 발급되었습니다."));
         } catch (RuntimeException e) {
             System.out.println("[Issue Coupon]" + e.getMessage());
