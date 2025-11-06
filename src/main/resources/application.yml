@@ -8,12 +8,18 @@ spring:
     password: ${DB_PASS:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 20
-      connection-timeout: 3000
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 1000
+      validation-timeout: 1000
       max-lifetime: 180000
   transaction:
     default-timeout: 2
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   sql:
     init:

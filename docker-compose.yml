@@ -2,6 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
+    container_name: coupon-postgres
     environment:
       POSTGRES_DB: coupon
       POSTGRES_USER: postgres
@@ -9,4 +10,43 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+
+  redis:
+    image: redis:7-alpine
+    container_name: coupon-redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  app:
+    container_name: coupon-server
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  postgres-data:
