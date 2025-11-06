@@ -31,10 +31,9 @@ public class IssuedCouponRepository {
 
     public void save(IssuedCoupon couponIssue) {
         jdbc.update(
-                "INSERT INTO coupon_issues (user_id, coupon_id, code) VALUES (?, ?, ?)",
+                "INSERT INTO coupon_issues (user_id, coupon_id) VALUES (?, ?)",
                 couponIssue.getUserId(),
-                couponIssue.getCouponId(),
-                couponIssue.getCode()
+                couponIssue.getCouponId()
         );
     }
 }

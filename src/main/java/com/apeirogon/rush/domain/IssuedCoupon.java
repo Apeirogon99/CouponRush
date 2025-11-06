@@ -6,12 +6,10 @@ package com.apeirogon.rush.domain;
 public class IssuedCoupon {
     private long userId;
     private long couponId;
-    private String code;
 
-    public IssuedCoupon(long userId, long couponId, String code) {
+    public IssuedCoupon(long userId, long couponId) {
         this.userId = userId;
         this.couponId = couponId;
-        this.code = code;
     }
 
     public long getUserId() {
@@ -20,9 +18,5 @@ public class IssuedCoupon {
 
     public long getCouponId() {
         return couponId;
-    }
-
-    public String getCode() {
-        return code;
     }
 }

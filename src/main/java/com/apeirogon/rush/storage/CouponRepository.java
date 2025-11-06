@@ -18,24 +18,14 @@ public class CouponRepository {
         this.jdbc = new JdbcTemplate(dataSource);
     }
 
-    public List<Coupon> findAll() {
-        return jdbc.query(
-                "SELECT id, name, total_quantity, issued_quantity FROM coupons",
-                (rs, rowNum) -> new Coupon(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getInt("total_quantity"),
-                        rs.getInt("issued_quantity")
-                )
-        );
-    }
-
+    /**
+     * 쿠폰 조회
+     */
     public Coupon findById(long id) {
         List<Coupon> coupons = jdbc.query(
-                "SELECT id, name, total_quantity, issued_quantity FROM coupons WHERE id = ?",
+                "SELECT id, total_quantity, issued_quantity FROM coupons WHERE id = ?",
                 (rs, rowNum) -> new Coupon(
                         rs.getLong("id"),
-                        rs.getString("name"),
                         rs.getInt("total_quantity"),
                         rs.getInt("issued_quantity")
                 ),
@@ -44,26 +34,14 @@ public class CouponRepository {
         return coupons.isEmpty() ? null : coupons.get(0);
     }
 
+    /**
+     * 쿠폰 조회 (락)
+     */
     public Coupon findByIdWithLockWait(long id) {
         List<Coupon> coupons = jdbc.query(
-                "SELECT id, name, total_quantity, issued_quantity FROM coupons WHERE id = ? FOR UPDATE",
+                "SELECT id, total_quantity, issued_quantity FROM coupons WHERE id = ? FOR UPDATE",
                 (rs, rowNum) -> new Coupon(
                         rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getInt("total_quantity"),
-                        rs.getInt("issued_quantity")
-                ),
-                id
-        );
-        return coupons.isEmpty() ? null : coupons.get(0);
-    }
-
-    public Coupon findByIdWithLockNoWait(long id) {
-        List<Coupon> coupons = jdbc.query(
-                "SELECT id, name, total_quantity, issued_quantity FROM coupons WHERE id = ? FOR UPDATE NOWAIT",
-                (rs, rowNum) -> new Coupon(
-                        rs.getLong("id"),
-                        rs.getString("name"),
                         rs.getInt("total_quantity"),
                         rs.getInt("issued_quantity")
                 ),
@@ -93,14 +71,23 @@ public class CouponRepository {
 
     /**
      * 쿠폰 저장
-     * 발급 수량과 업데이트만 저장
      */
     public void save(Coupon coupon) {
-        jdbc.update(
-                "UPDATE coupons SET issued_quantity = ?, updated_at = ? WHERE id = ?",
+
+        int updatedRows = jdbc.update(
+                "UPDATE coupons SET total_quantity = ?, issued_quantity = ? WHERE id = ?",
+                coupon.getTotalQuantity(),
                 coupon.getIssuedQuantity(),
-                LocalDateTime.now(),
                 coupon.getId()
         );
+
+        if (updatedRows == 0) {
+            jdbc.update(
+                    "INSERT INTO coupons (id, total_quantity, issued_quantity) VALUES (?, ?, ?)",
+                    coupon.getId(),
+                    coupon.getTotalQuantity(),
+                    coupon.getIssuedQuantity()
+            );
+        }
     }
 }
