@@ -1,7 +1,6 @@
 spring:
   application:
     name: CouponRush
-
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/coupon
     username: ${DB_USER:postgres}
@@ -15,16 +14,79 @@ spring:
       max-lifetime: 180000
   transaction:
     default-timeout: 2
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
 
+app:
+  features:
+    cache: false      # Redis 사용 여부
+    messaging: false  # Kafka 사용 여부
+
+server:
+  port: 8080
+
+---
+# Scenario 1: DB
+spring:
+  config:
+    activate:
+      on-profile: scenario1
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+app:
+  features:
+    cache: false
+    messaging: false
+
+---
+# Scenario 2: DB + Redis
+spring:
+  config:
+    activate:
+      on-profile: scenario2
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
+app:
+  features:
+    cache: true
+    messaging: false
 
-server:
-  port: 8080
+---
+# Scenario 3: DB + Redis + Kafka
+spring:
+  config:
+    activate:
+      on-profile: scenario3
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  features:
+    cache: true
+    messaging: true

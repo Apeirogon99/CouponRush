@@ -4,5 +4,8 @@ public enum ErrorCode {
 
     E500,
 
-    ERROR_COUPON_1,
+    E400,
+    E404,
+    E409,
+    E410,
 }
