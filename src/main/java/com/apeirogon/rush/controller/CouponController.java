@@ -30,7 +30,7 @@ public class CouponController {
      */
     @PostMapping("/{couponId}/init")
     public ApiResult<String> initCoupon(@PathVariable Long couponId, @RequestParam Integer quantity) {
-        couponService.initCoupon(couponId, quantity);
+        couponService.initCoupon(couponId, quantity, useCache, useMessaging);
         return ApiResult.success("쿠폰이 생성되었습니다.");
     }
 
@@ -48,6 +48,6 @@ public class CouponController {
      */
     @GetMapping("/coupons/{couponId}")
     public ApiResult<Coupon> getCoupon(@PathVariable Long couponId) {
-        return ApiResult.success(couponService.getCoupon(couponId));
+        return ApiResult.success(couponService.getCoupon(couponId, useCache, useMessaging));
     }
 }

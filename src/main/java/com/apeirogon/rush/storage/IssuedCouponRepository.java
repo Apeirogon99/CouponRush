@@ -1,9 +1,7 @@
 package com.apeirogon.rush.storage;
 
-import com.apeirogon.rush.domain.Coupon;
 import com.apeirogon.rush.domain.IssuedCoupon;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

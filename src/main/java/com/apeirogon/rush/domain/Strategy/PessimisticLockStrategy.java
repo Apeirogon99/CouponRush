@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *  scenario #1
- *  DB 비관적락
+ *  scenario #1 (DB)
+ *  DB : 중복 확인, 쿠폰 발급, 발급 저장
  */
 @Service
 public class PessimisticLockStrategy implements CouponIssueStrategy {
