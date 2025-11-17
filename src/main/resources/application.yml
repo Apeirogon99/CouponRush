@@ -64,6 +64,13 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 5
+        queue-capacity: 5
+        keep-alive: 30s
 
 app:
   features:

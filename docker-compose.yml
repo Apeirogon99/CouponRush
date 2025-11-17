@@ -86,7 +86,7 @@ services:
         limits:
           cpus: '2.0'
           memory: 2G
-    profiles: ["scenario1", "scenario2", "scenario3"]
+    profiles: ["app"]
 
 volumes:
   postgres-data:

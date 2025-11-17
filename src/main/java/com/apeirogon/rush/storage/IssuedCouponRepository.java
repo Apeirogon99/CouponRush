@@ -18,7 +18,7 @@ public class IssuedCouponRepository {
         this.jdbc = new JdbcTemplate(dataSource);
     }
 
-    public boolean duplicateIssued(Long userId, Long couponId) {
+    public boolean existsByUserIdAndCouponId(Long userId, Long couponId) {
         Boolean ret = jdbc.queryForObject(
                 "SELECT EXISTS(SELECT 1 FROM coupon_issues WHERE user_id = ? AND coupon_id = ?)",
                 Boolean.class,

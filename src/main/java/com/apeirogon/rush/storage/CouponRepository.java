@@ -53,15 +53,7 @@ public class CouponRepository {
     /**
      * 쿠폰 발행 증가
      */
-    public void increaseIssuedQuantity(Long couponId) {
-        jdbc.update(
-                "UPDATE coupons SET issued_quantity = issued_quantity + 1, updated_at = ? WHERE id = ?",
-                LocalDateTime.now(),
-                couponId
-        );
-    }
-
-    public int increaseIssuedQuantityWithCheck(Long couponId) {
+    public int increaseIssuedQuantity(Long couponId) {
         return jdbc.update(
                 "UPDATE coupons SET issued_quantity = issued_quantity + 1, updated_at = ? WHERE id = ? AND issued_quantity <= total_quantity",
                 LocalDateTime.now(),

@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorType {
 
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.", LogLevel.ERROR),
+
+    LOCK_ACQUISITION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "Redis lock interrupted.", LogLevel.ERROR),
+
     COUPON_FAIL_REGISTER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "Coupon fail register.", LogLevel.ERROR),
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Coupon not found.", LogLevel.ERROR),
     COUPON_ALREADY_ISSUED(HttpStatus.CONFLICT, ErrorCode.E409, "Coupon already issued.", LogLevel.ERROR),

@@ -30,6 +30,10 @@ public class Coupon {
         return id;
     }
 
+    public boolean isSoldOut() {
+        return issuedQuantity >= totalQuantity;
+    }
+
     public int getTotalQuantity() {
         return totalQuantity;
     }

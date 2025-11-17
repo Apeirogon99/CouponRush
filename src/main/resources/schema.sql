@@ -25,7 +25,7 @@ CREATE TABLE coupon_issues (
     user_id BIGINT NOT NULL,
     issued_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (coupon_id) REFERENCES coupons(id),
-    UNIQUE (coupon_id, user_id)
+    UNIQUE (user_id, coupon_id)
 );
 
 CREATE INDEX idx_coupon_issues_user_id ON coupon_issues(user_id);
