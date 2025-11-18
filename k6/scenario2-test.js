@@ -4,8 +4,8 @@ import { Rate, Counter, Trend } from 'k6/metrics';
 
 const BASE_URL = 'http://localhost:8080';
 const COUPON_ID = 1;
-const COUPON_QUANTITY = 2000;
-const TOTAL_USERS = 4000;
+const COUPON_QUANTITY = 1000;
+const TOTAL_USERS = 2000;
 
 const successRate = new Rate('coupon_issue_success');
 const soldOutRate = new Rate('coupon_sold_out');

@@ -1,4 +1,4 @@
-package com.apeirogon.rush.domain.Strategy;
+package com.apeirogon.rush.Strategy;
 
 import com.apeirogon.rush.domain.Coupon;
 

@@ -19,7 +19,21 @@ public class CouponRepository {
     }
 
     /**
-     * 쿠폰 조회
+     *  전체 쿠폰 조회
+     */
+    public List<Coupon> findAll() {
+        return jdbc.query(
+                "SELECT id, total_quantity, issued_quantity FROM coupons",
+                (rs, rowNum) -> new Coupon(
+                        rs.getLong("id"),
+                        rs.getInt("total_quantity"),
+                        rs.getInt("issued_quantity")
+                )
+        );
+    }
+
+    /**
+     *  특정 쿠폰 조회
      */
     public Coupon findById(long id) {
         List<Coupon> coupons = jdbc.query(
@@ -81,5 +95,12 @@ public class CouponRepository {
                     coupon.getIssuedQuantity()
             );
         }
+    }
+
+    /**
+     *  전체 삭제
+     */
+    public void deleteAll() {
+        jdbc.update("DELETE FROM coupons");
     }
 }

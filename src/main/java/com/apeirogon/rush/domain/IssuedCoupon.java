@@ -7,6 +7,11 @@ public class IssuedCoupon {
     private long userId;
     private long couponId;
 
+    public IssuedCoupon() {
+        this.userId = 0;
+        this.couponId = 0;
+    }
+
     public IssuedCoupon(long userId, long couponId) {
         this.userId = userId;
         this.couponId = couponId;

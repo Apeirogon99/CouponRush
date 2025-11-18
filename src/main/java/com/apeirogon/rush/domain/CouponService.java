@@ -1,9 +1,9 @@
 package com.apeirogon.rush.domain;
 
-import com.apeirogon.rush.domain.Strategy.CouponIssueStrategy;
-import com.apeirogon.rush.domain.Strategy.DistributedStrategy;
-import com.apeirogon.rush.domain.Strategy.MessagingStrategy;
-import com.apeirogon.rush.domain.Strategy.PessimisticLockStrategy;
+import com.apeirogon.rush.Strategy.CouponIssueStrategy;
+import com.apeirogon.rush.Strategy.DistributedStrategy;
+import com.apeirogon.rush.Strategy.MessagingStrategy;
+import com.apeirogon.rush.Strategy.PessimisticLockStrategy;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -9,11 +9,10 @@ public enum ErrorType {
 
     LOCK_ACQUISITION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "Redis lock interrupted.", LogLevel.ERROR),
 
-    COUPON_FAIL_REGISTER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "Coupon fail register.", LogLevel.ERROR),
-    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Coupon not found.", LogLevel.ERROR),
-    COUPON_ALREADY_ISSUED(HttpStatus.CONFLICT, ErrorCode.E409, "Coupon already issued.", LogLevel.ERROR),
-    COUPON_SOLD_OUT(HttpStatus.CONFLICT, ErrorCode.E409, "Coupon sold out.", LogLevel.ERROR),
-    COUPON_ENDED(HttpStatus.GONE, ErrorCode.E410, "Coupon ended.", LogLevel.ERROR);
+    COUPON_FAIL_REGISTER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "Coupon fail register.", LogLevel.WARN),
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Coupon not found.", LogLevel.WARN),
+    COUPON_ALREADY_ISSUED(HttpStatus.CONFLICT, ErrorCode.E409, "Coupon already issued.", LogLevel.WARN),
+    COUPON_SOLD_OUT(HttpStatus.GONE, ErrorCode.E410, "Coupon sold out.", LogLevel.WARN);
 
     private final HttpStatus status;
 

@@ -1,4 +1,4 @@
-package com.apeirogon.rush.domain.Strategy;
+package com.apeirogon.rush.Strategy;
 
 import com.apeirogon.rush.domain.Coupon;
 import com.apeirogon.rush.domain.IssuedCoupon;
@@ -33,6 +33,9 @@ public class PessimisticLockStrategy implements CouponIssueStrategy {
     @Override
     @Transactional
     public void initCoupon(Long couponId, Integer quantity) {
+        issuedCouponRepository.deleteAll();
+        couponRepository.deleteAll();
+
         Coupon coupon = new Coupon(couponId, quantity);
         couponRepository.save(coupon);
 
