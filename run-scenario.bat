@@ -11,7 +11,7 @@ if "%1"=="" (
 
 set SCENARIO=scenario%1
 set SCENARIO_PROFILE=scenario%1
-set TEST_SCRIPT=scenario%1-test.js
+set TEST_SCRIPT=load-test.js
 set LOG_FILE=logs\scenario%1-%date:~0,4%%date:~5,2%%date:~8,2%-%time:~0,2%%time:~3,2%%time:~6,2%.log
 set LOG_FILE=%LOG_FILE: =0%
 

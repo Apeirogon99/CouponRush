@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: CouponRush-Test
+  datasource:
+    url: jdbc:mysql://localhost:3307/coupon?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+app:
+  features:
+    cache: false
+    messaging: false
