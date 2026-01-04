@@ -1,4 +1,4 @@
-package com.apeirogon.rush.controller;
+package com.apeirogon.rush.api.controller;
 
 import com.apeirogon.rush.support.error.CoreException;
 import com.apeirogon.rush.support.error.ErrorType;

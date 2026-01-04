@@ -1,16 +1,18 @@
-package com.apeirogon.rush.Strategy;
+package com.apeirogon.rush.strategy;
 
+import com.apeirogon.rush.api.controller.response.CouponResponse;
+import com.apeirogon.rush.api.controller.response.CreateCouponResponse;
+import com.apeirogon.rush.api.controller.response.IssueCouponResponse;
 import com.apeirogon.rush.domain.Coupon;
 import com.apeirogon.rush.domain.IssuedCoupon;
-import com.apeirogon.rush.storage.CouponRepository;
-import com.apeirogon.rush.storage.IssuedCouponRepository;
+import com.apeirogon.rush.storage.JdbcCouponRepository;
+import com.apeirogon.rush.storage.JdbcIssuedCouponRepository;
 import com.apeirogon.rush.support.error.CoreException;
 import com.apeirogon.rush.support.error.ErrorType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,47 +29,49 @@ import java.util.concurrent.TimeUnit;
  * DB : 발급 저장 (비동기)
  */
 @Service
-@ConditionalOnProperty(name = "app.features.cache", havingValue = "true")
+@Profile("scenario2")
 public class DistributedStrategy implements CouponIssueStrategy {
 
-    private final CouponRepository couponRepository;
-    private final IssuedCouponRepository issuedCouponRepository;
+    private final JdbcCouponRepository jdbcCouponRepository;
+    private final JdbcIssuedCouponRepository jdbcIssuedCouponRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedissonClient redissonClient;
 
     @Autowired
     public DistributedStrategy(
-            CouponRepository couponRepository,
-            IssuedCouponRepository issuedCouponRepository,
+            JdbcCouponRepository jdbcCouponRepository,
+            JdbcIssuedCouponRepository jdbcIssuedCouponRepository,
 
             RedisTemplate<String, Object> redisTemplate,
             RedissonClient redissonClient
     ) {
-        this.couponRepository = couponRepository;
-        this.issuedCouponRepository = issuedCouponRepository;
+        this.jdbcCouponRepository = jdbcCouponRepository;
+        this.jdbcIssuedCouponRepository = jdbcIssuedCouponRepository;
 
         this.redisTemplate = redisTemplate;
         this.redissonClient = redissonClient;
     }
 
     @Override
-    public void initCoupon(Long couponId, Integer quantity) {
-        issuedCouponRepository.deleteAll();
-        couponRepository.deleteAll();
+    public CreateCouponResponse createCoupon(Integer quantity) {
+        jdbcIssuedCouponRepository.deleteAll();
+        jdbcCouponRepository.deleteAll();
         redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
 
-        Coupon coupon = new Coupon(couponId, quantity);
-        couponRepository.save(coupon);
+        Coupon coupon = new Coupon(null, quantity, 0);
+        Coupon saved = jdbcCouponRepository.save(coupon);
 
-        String key = "COUPON:" + couponId;
+        String key = "COUPON:" + saved.getId();
         redisTemplate.opsForValue().set(key, quantity, Duration.ofDays(1));
+
+        return new CreateCouponResponse(saved.getId());
     }
 
     @Scheduled(fixedRate = 5000)
     @Transactional
     public void syncCouponQuantity() {
-        List<Coupon> coupons = couponRepository.findAll();
+        List<Coupon> coupons = jdbcCouponRepository.findAll();
 
         for (Coupon coupon : coupons) {
             String key = "COUPON:" + coupon.getId();
@@ -82,7 +85,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
     }
 
     @Override
-    public void issueCoupon(Long couponId, Long userId) {
+    public IssueCouponResponse issueCoupon(Long couponId, Long userId) {
         final String couponKey = "COUPON:" + couponId;
         final String userCouponSetKey = "ISSUED:" + couponKey;
         final String lockKey = "LOCK:USER:" + userId + ":COUPON:" + couponId;
@@ -116,6 +119,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
             redisTemplate.expire(userCouponSetKey, Duration.ofDays(1));
 
             asyncCouponSave(userId, couponId, couponKey, userCouponSetKey);
+            return new IssueCouponResponse(1);
 
         } catch (InterruptedException e) {
             throw new CoreException(ErrorType.LOCK_ACQUISITION_FAILED);
@@ -132,7 +136,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
 
         try {
             // DB에서 중복 확인
-            if (issuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
+            if (jdbcIssuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
 
                 // 이미 발급 받았으므로 복구
                 redisTemplate.opsForValue().increment(couponKey);
@@ -141,7 +145,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
             }
 
             // 쿠폰 발급
-            int updated = couponRepository.increaseIssuedQuantity(couponId);
+            int updated = jdbcCouponRepository.increaseIssuedQuantity(couponId);
             if (updated == 0) {
 
                 // 재고가 없으므로 복구
@@ -152,7 +156,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
             }
 
             // 쿠폰 발급 테이블에 저장
-            issuedCouponRepository.save(new IssuedCoupon(userId, couponId));
+            jdbcIssuedCouponRepository.save(new IssuedCoupon(userId, couponId));
 
         } catch (Exception e) {
             redisTemplate.opsForValue().increment(couponKey);
@@ -162,7 +166,7 @@ public class DistributedStrategy implements CouponIssueStrategy {
 
     @Override
     @Transactional(readOnly = true)
-    public Coupon getCoupon(Long couponId) {
-        return couponRepository.findById(couponId);
+    public CouponResponse getCoupons() {
+        return new CouponResponse(jdbcCouponRepository.findAll());
     }
 }

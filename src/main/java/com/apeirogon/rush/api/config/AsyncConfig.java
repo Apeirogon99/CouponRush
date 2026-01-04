@@ -1,4 +1,4 @@
-package com.apeirogon.rush.config;
+package com.apeirogon.rush.api.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

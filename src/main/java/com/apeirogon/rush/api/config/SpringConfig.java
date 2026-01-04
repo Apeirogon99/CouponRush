@@ -1,7 +1,7 @@
-package com.apeirogon.rush.config;
+package com.apeirogon.rush.api.config;
 
-import com.apeirogon.rush.storage.CouponRepository;
-import com.apeirogon.rush.storage.IssuedCouponRepository;
+import com.apeirogon.rush.storage.JdbcCouponRepository;
+import com.apeirogon.rush.storage.JdbcIssuedCouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,13 +22,13 @@ public class SpringConfig {
     }
 
     @Bean
-    public CouponRepository couponRepository() {
-        return new CouponRepository(dataSource);
+    public JdbcCouponRepository couponRepository() {
+        return new JdbcCouponRepository(dataSource);
     }
 
     @Bean
-    public IssuedCouponRepository issuedCouponRepository() {
-        return new IssuedCouponRepository(dataSource);
+    public JdbcIssuedCouponRepository issuedCouponRepository() {
+        return new JdbcIssuedCouponRepository(dataSource);
     }
 
 }

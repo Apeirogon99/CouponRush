@@ -1,4 +1,4 @@
-package com.apeirogon.rush.config;
+package com.apeirogon.rush.api.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

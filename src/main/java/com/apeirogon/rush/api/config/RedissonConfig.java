@@ -1,4 +1,4 @@
-package com.apeirogon.rush.config;
+package com.apeirogon.rush.api.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

@@ -1,21 +1,12 @@
 package com.apeirogon.rush.domain;
 
 /**
- *  발급된 쿠폰
+ * 발급된 쿠폰
  */
-public class IssuedCoupon {
-    private long userId;
-    private long couponId;
-
-    public IssuedCoupon() {
-        this.userId = 0;
-        this.couponId = 0;
-    }
-
-    public IssuedCoupon(long userId, long couponId) {
-        this.userId = userId;
-        this.couponId = couponId;
-    }
+public record IssuedCoupon(
+        Long userId,
+        Long couponId
+) {
 
     public long getUserId() {
         return userId;

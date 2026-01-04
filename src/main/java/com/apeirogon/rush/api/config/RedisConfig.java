@@ -1,4 +1,4 @@
-package com.apeirogon.rush.config;
+package com.apeirogon.rush.api.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
