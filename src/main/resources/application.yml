@@ -2,10 +2,10 @@ spring:
   application:
     name: CouponRush
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/coupon
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:postgres}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/coupon?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: ${DB_USER:root}
+    password: ${DB_PASS:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10

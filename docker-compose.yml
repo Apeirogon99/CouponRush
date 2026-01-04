@@ -1,17 +1,17 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: coupon-postgres
+  mysql:
+    image: mysql:8.0
+    container_name: coupon-mysql
     environment:
-      POSTGRES_DB: coupon
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      MYSQL_DATABASE: coupon
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "5432:5432"
+      - "3307:3306"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -70,15 +70,16 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SCENARIO_PROFILE:-scenario1}
-      DB_HOST: postgres
-      DB_USER: postgres
-      DB_PASS: postgres
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: root
       REDIS_HOST: redis
       REDIS_PORT: 6379
       KAFKA_HOST: kafka
       JAVA_OPTS: "-Xmx1g -Xms512m"
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     restart: on-failure
     deploy:
@@ -89,4 +90,4 @@ services:
     profiles: ["app"]
 
 volumes:
-  postgres-data:
+  mysql-data:

@@ -77,7 +77,7 @@ run-scenario 3
 ## #1 Scenario - db
 
 ### 아키텍쳐
-[server] <---> [postgres]
+[server] <---> [mysql]
 
 ### 부하테스트 결과 요약
 
@@ -93,7 +93,7 @@ Where 절 : 단순히 쿠폰의 제고를 차감하고 발급하는 경우
 ### #2 Scenario - db + redis
 
 ### 아키텍쳐
-[server] <---> [redis] <---> [postgres]
+[server] <---> [redis] <---> [mysql]
 
 ### 부하테스트 결과 요약
 
@@ -106,7 +106,7 @@ TPS ( 1000 )
 ### #3 Scenario - db + redis + kafka
 
 ### 아키텍쳐
-[server] <---> [redis] <---> [postgres]
+[server] <---> [redis] <---> [mysql]
 
 ### 부하테스트 결과 요약
 
@@ -125,12 +125,12 @@ TPS ( 5000 )
 - Java 17
 - Spring Boot 3.5.6
 - JDBC
-- PostgresSQL 15
+- MySQL 8.0
 - Redis 7
 - Kafka 7.5.0
 
 ## Container deploy
 - app      : 2core 2ram
-- postgres : 2core 2ram
+- mysql    : 2core 2ram
 - redis    : 1core 1ram
 - kafka    : 2core 2ram
