@@ -34,6 +34,9 @@ app:
 
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 500
 
 ---
 # Scenario 1: DB
@@ -67,9 +70,9 @@ spring:
   task:
     execution:
       pool:
-        core-size: 5
-        max-size: 5
-        queue-capacity: 5
+        core-size: 20
+        max-size: 50
+        queue-capacity: 500
         keep-alive: 30s
 
 app:
@@ -88,10 +91,17 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
   kafka:
-    bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: coupon-issue-consumer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: com.apeirogon.rush.messaging
+        spring.json.value.default.type: com.apeirogon.rush.messaging.CouponIssueEvent
 
 app:
   features:
