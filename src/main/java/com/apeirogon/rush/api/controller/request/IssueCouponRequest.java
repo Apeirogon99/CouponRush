@@ -1,7 +1,9 @@
 package com.apeirogon.rush.api.controller.request;
 
+import jakarta.validation.constraints.NotNull;
+
 public record IssueCouponRequest(
-        Long userId,
+        @NotNull Long userId,
         Long couponId
 ) {
 }

@@ -8,6 +8,7 @@ import com.apeirogon.rush.api.controller.response.IssueCouponResponse;
 import com.apeirogon.rush.strategy.CouponIssueStrategy;
 import com.apeirogon.rush.support.response.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +24,7 @@ public class CouponController {
      * 쿠폰 생성
      */
     @PostMapping("/coupons")
-    public ApiResult<CreateCouponResponse> createCoupon(@RequestBody CreateCouponRequest request) {
+    public ApiResult<CreateCouponResponse> createCoupon(@Valid @RequestBody CreateCouponRequest request) {
         return ApiResult.success(couponIssueStrategy.createCoupon(request.quantity()));
     }
 
@@ -31,7 +32,7 @@ public class CouponController {
      * 쿠폰 발급
      */
     @PostMapping("/coupons/{couponId}/issues")
-    public ApiResult<IssueCouponResponse> issueCoupon(@PathVariable Long couponId, @RequestBody IssueCouponRequest request) {
+    public ApiResult<IssueCouponResponse> issueCoupon(@PathVariable Long couponId, @Valid @RequestBody IssueCouponRequest request) {
         return ApiResult.success(couponIssueStrategy.issueCoupon(couponId, request.userId()));
     }
 

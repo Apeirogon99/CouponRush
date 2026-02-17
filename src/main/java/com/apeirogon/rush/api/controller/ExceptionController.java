@@ -6,6 +6,7 @@ import com.apeirogon.rush.support.response.ApiResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,6 +23,12 @@ public class ExceptionController {
             default -> log.info("CoreException : {}", e.getMessage(), e);
         }
         return new ResponseEntity<>(ApiResult.error(e.getErrorType(), e.getData()), e.getErrorType().getStatus());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResult<?>> handleValidationException(MethodArgumentNotValidException e) {
+        log.warn("ValidationException : {}", e.getMessage());
+        return new ResponseEntity<>(ApiResult.error(ErrorType.COUPON_FAIL_REGISTER), ErrorType.COUPON_FAIL_REGISTER.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
