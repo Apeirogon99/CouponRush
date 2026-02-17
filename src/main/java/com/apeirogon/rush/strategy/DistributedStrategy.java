@@ -3,8 +3,8 @@ package com.apeirogon.rush.strategy;
 import com.apeirogon.rush.api.controller.response.CouponResponse;
 import com.apeirogon.rush.api.controller.response.CreateCouponResponse;
 import com.apeirogon.rush.api.controller.response.IssueCouponResponse;
+import com.apeirogon.rush.async.AsyncCouponSaver;
 import com.apeirogon.rush.domain.Coupon;
-import com.apeirogon.rush.domain.IssuedCoupon;
 import com.apeirogon.rush.storage.JdbcCouponRepository;
 import com.apeirogon.rush.storage.JdbcIssuedCouponRepository;
 import com.apeirogon.rush.support.error.CoreException;
@@ -14,7 +14,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +36,21 @@ public class DistributedStrategy implements CouponIssueStrategy {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedissonClient redissonClient;
+    private final AsyncCouponSaver asyncCouponSaver;
 
     @Autowired
     public DistributedStrategy(
             JdbcCouponRepository jdbcCouponRepository,
             JdbcIssuedCouponRepository jdbcIssuedCouponRepository,
-
             RedisTemplate<String, Object> redisTemplate,
-            RedissonClient redissonClient
+            RedissonClient redissonClient,
+            AsyncCouponSaver asyncCouponSaver
     ) {
         this.jdbcCouponRepository = jdbcCouponRepository;
         this.jdbcIssuedCouponRepository = jdbcIssuedCouponRepository;
-
         this.redisTemplate = redisTemplate;
         this.redissonClient = redissonClient;
+        this.asyncCouponSaver = asyncCouponSaver;
     }
 
     @Override
@@ -90,36 +90,44 @@ public class DistributedStrategy implements CouponIssueStrategy {
         final String userCouponSetKey = "ISSUED:" + couponKey;
         final String lockKey = "LOCK:USER:" + userId + ":COUPON:" + couponId;
 
+        // 사전 검증
+        if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(userCouponSetKey, userId.toString()))) {
+            throw new CoreException(ErrorType.COUPON_ALREADY_ISSUED);
+        }
+
+        Integer remaining = (Integer) redisTemplate.opsForValue().get(couponKey);
+        if (remaining == null) {
+            throw new CoreException(ErrorType.COUPON_NOT_FOUND);
+        }
+        if (remaining <= 0) {
+            throw new CoreException(ErrorType.COUPON_SOLD_OUT);
+        }
+
+        // 분산락 획득
         RLock lock = redissonClient.getLock(lockKey);
         try {
-
-            // 락 얻기 시도
             if (!lock.tryLock(3, TimeUnit.SECONDS)) {
                 throw new CoreException(ErrorType.LOCK_ACQUISITION_FAILED);
             }
 
-            // 중복 체크
+            // 락 안에서 중복 재확인
             if (Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(userCouponSetKey, userId.toString()))) {
                 throw new CoreException(ErrorType.COUPON_ALREADY_ISSUED);
             }
 
-            // 쿠폰 존재 확인
+            // 재고 차감
             Long quantity = redisTemplate.opsForValue().decrement(couponKey);
             if (quantity == null) {
                 throw new CoreException(ErrorType.COUPON_NOT_FOUND);
             }
-
-            // 재고 남았는지 확인
             if (quantity < 0) {
                 redisTemplate.opsForValue().increment(couponKey);
                 throw new CoreException(ErrorType.COUPON_SOLD_OUT);
             }
 
+            // 발급 기록
             redisTemplate.opsForSet().add(userCouponSetKey, userId.toString());
             redisTemplate.expire(userCouponSetKey, Duration.ofDays(1));
-
-            asyncCouponSave(userId, couponId, couponKey, userCouponSetKey);
-            return new IssueCouponResponse(1);
 
         } catch (InterruptedException e) {
             throw new CoreException(ErrorType.LOCK_ACQUISITION_FAILED);
@@ -128,40 +136,10 @@ public class DistributedStrategy implements CouponIssueStrategy {
                 lock.unlock();
             }
         }
-    }
 
-    @Async
-    @Transactional
-    public void asyncCouponSave(Long userId, Long couponId, String couponKey, String userCouponKey) {
-
-        try {
-            // DB에서 중복 확인
-            if (jdbcIssuedCouponRepository.existsByUserIdAndCouponId(userId, couponId)) {
-
-                // 이미 발급 받았으므로 복구
-                redisTemplate.opsForValue().increment(couponKey);
-                redisTemplate.opsForSet().remove(userCouponKey, userId.toString());
-                return;
-            }
-
-            // 쿠폰 발급
-            int updated = jdbcCouponRepository.increaseIssuedQuantity(couponId);
-            if (updated == 0) {
-
-                // 재고가 없으므로 복구
-                redisTemplate.opsForValue().increment(couponKey);
-                redisTemplate.opsForSet().remove(userCouponKey, userId.toString());
-                redisTemplate.opsForValue().set(couponKey, 0);
-                return;
-            }
-
-            // 쿠폰 발급 테이블에 저장
-            jdbcIssuedCouponRepository.save(new IssuedCoupon(userId, couponId));
-
-        } catch (Exception e) {
-            redisTemplate.opsForValue().increment(couponKey);
-            redisTemplate.opsForSet().remove(userCouponKey, userId.toString());
-        }
+        // 비동기 DB 저장 (별도 빈을 통해 프록시 경유 → @Async 정상 동작)
+        asyncCouponSaver.save(userId, couponId, couponKey, userCouponSetKey);
+        return new IssueCouponResponse(1);
     }
 
     @Override
