@@ -21,8 +21,8 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 // ========================================
 // 테스트 파라미터
 // ========================================
-const COUPON_QUANTITY = 100;    // 쿠폰 수량 (한정)
-const TOTAL_USERS = 1000;       // 총 요청 사용자 수
+const COUPON_QUANTITY = 1000;   // 쿠폰 수량 (한정)
+const TOTAL_USERS = 3000;       // 총 요청 사용자 수
 const SPIKE_DURATION = '10s';   // 스파이크 지속 시간
 const RAMP_UP = '1s';           // 스파이크 도달 시간
 
