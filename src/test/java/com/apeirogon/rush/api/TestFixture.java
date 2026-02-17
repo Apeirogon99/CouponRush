@@ -1,12 +1,15 @@
 package com.apeirogon.rush.api;
 
 import com.apeirogon.rush.api.controller.request.CreateCouponRequest;
-import com.apeirogon.rush.api.controller.response.CouponResponse;
+import com.apeirogon.rush.api.controller.request.IssueCouponRequest;
+import com.apeirogon.rush.api.controller.response.CreateCouponResponse;
 import com.apeirogon.rush.support.response.ApiResult;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Objects;
 
 public record TestFixture(
         TestRestTemplate client
@@ -28,11 +31,23 @@ public record TestFixture(
         return response.getBody();
     }
 
-    public void createCoupon() {
-        CreateCouponRequest request = new CreateCouponRequest(100);
-        ApiResult<CouponResponse> result = post(
+    public Long createCoupon() {
+        return createCoupon(100);
+    }
+
+    public Long createCoupon(int quantity) {
+        ApiResult<CreateCouponResponse> result = post(
                 "/coupons",
-                request,
+                new CreateCouponRequest(quantity),
+                new ParameterizedTypeReference<>() { }
+        );
+        return Objects.requireNonNull(result.getData()).id();
+    }
+
+    public void issueCoupon(Long couponId, Long userId) {
+        post(
+                "/coupons/" + couponId + "/issues",
+                new IssueCouponRequest(userId, couponId),
                 new ParameterizedTypeReference<>() { }
         );
     }

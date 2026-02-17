@@ -3,6 +3,7 @@ package com.apeirogon.rush.api;
 import com.apeirogon.rush.CouponRushApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

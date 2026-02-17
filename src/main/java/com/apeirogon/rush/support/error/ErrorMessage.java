@@ -5,6 +5,12 @@ public class ErrorMessage {
     private final String message;
     private final Object data;
 
+    private ErrorMessage() {
+        this.code = null;
+        this.message = null;
+        this.data = null;
+    }
+
     public ErrorMessage(ErrorType errorType) {
         this.code = errorType.getCode().name();
         this.message = errorType.getMessage();

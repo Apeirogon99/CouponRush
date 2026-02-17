@@ -9,6 +9,12 @@ public class ApiResult<S> {
     private final S data;
     private final ErrorMessage error;
 
+    private ApiResult() {
+        this.result = null;
+        this.data = null;
+        this.error = null;
+    }
+
     private ApiResult(ResultType result, S data, ErrorMessage error) {
         this.result = result;
         this.data = data;
